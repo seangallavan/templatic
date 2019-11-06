@@ -1,0 +1,4 @@
+dataRepo:
+  path: /Users/sean/code/templatic-data
+  name: templatic-data
+  url: git+https://github.com/seangallavan/templatic-data.git
