@@ -5,24 +5,33 @@ const yaml = require('js-yaml');
 const Nunjucks = require('nunjucks');
 const fs = require('fs-extra');
 
+const secrets = require('./secrets');
 const config = require('../config');
-const data = require('../lib/data');
 
 let nunjucks = {};
-const containerNunjucks = new Nunjucks.Environment(
-  new Nunjucks.FileSystemLoader(`${config.get('dataRepo:path')}/input/containers`)
+const nunjucks2 = new Nunjucks.Environment(
+  new Nunjucks.FileSystemLoader('.')
 );
-let hasBeenInitialized = false;
 
 function init() {
-  if(hasBeenInitialized) {
-    return;
-  }
-
-  data.getTemplateGroupNames().forEach(templateGroup => {
-    if(!nunjucks[templateGroup]) {
-      nunjucks[templateGroup] = new Nunjucks.Environment(new Nunjucks.FileSystemLoader(`${config.get('dataRepo:path')}/input/templates/${templateGroup}`));
+  fs.readdirSync(`${config.get('dataRepo:path')}/templates`).forEach(categoryDir => {
+    if(['.', '..'].includes(categoryDir)) {
+      return;
     }
+
+    if(!nunjucks[categoryDir]) {
+      nunjucks[categoryDir] = {};
+    }
+
+    fs.readdirSync(`${config.get('dataRepo:path')}/templates/${categoryDir}`).forEach(groupDir => {
+      if(['.', '..'].includes(groupDir)) {
+        return;
+      }
+
+      nunjucks[categoryDir][groupDir] = new Nunjucks.Environment(
+        new Nunjucks.FileSystemLoader(`${config.get('dataRepo:path')}/templates/${categoryDir}/${groupDir}`)
+      );
+    });
   });
 }
 /**
@@ -35,54 +44,38 @@ function init() {
 module.exports.getVariables = function getVariables(repoName, environment, templateGroup = null, templateName = null) {
   const applicationInfo = yaml.safeLoad(fs.readFileSync(`${config.get('dataRepo:path')}/input/applications/${repoName}.yml`, 'utf8'));
   const environmentInfo = yaml.safeLoad(fs.readFileSync(`${config.get('dataRepo:path')}/input/environments/${environment}.yml`, 'utf8'));
-  const globalInfo = yaml.safeLoad(fs.readFileSync(`${config.get('dataRepo:path')}/input/vars.yml`, 'utf8'));
+  const globalInfo = yaml.safeLoad(fs.readFileSync(`${config.get('dataRepo:path')}/input/global/config.yml`, 'utf8'));
 
-  const vars = mergeObjectsConcatArrays([globalInfo, _.omit(applicationInfo, ['containers', 'templates']), environmentInfo]);
+  const merged = mergeObjectsConcatArrays([globalInfo, environmentInfo, applicationInfo]);
+  const vars = _.omit(merged, ['containers', 'templates']);
+  vars.env = environment;
 
   //Get port to use locally for health checks
-  vars.localHealthCheckPort = 5000 + (Date.now() % 3000);
+  vars.localHealthCheckPort = 5000 + (Date.now() % 1000);
 
-  //Get Template Vars
-  if(applicationInfo.templates) {
-    vars.templates = {};
-    Object.keys(applicationInfo.templates).forEach(templateGroupName => {
-      vars.templates[templateGroupName] = {};
-
-      Object.keys(applicationInfo.templates[templateGroupName]).forEach(templateName => {
-        const envInfo = _.get(applicationInfo, `templates['${templateGroupName}']['${templateName}'].environmentOverrides['${environment}']`, {});
-        const defaultInfo = _.get(applicationInfo.templates[templateGroupName][templateName], 'default', {});
-        console.log('ai', JSON.stringify(applicationInfo))
-        console.log('ei', envInfo);
-        console.log('di', defaultInfo);
-
-        vars.templates[templateGroupName][templateName] = mergeObjectsConcatArrays([defaultInfo, envInfo]);
-      });
+  //Application level template variables
+  if(templateGroup && templateName && _.get(merged, `templates.${templateGroup}.${templateName}`)) {
+    Object.keys(merged.templates[templateGroup][templateName]).forEach(variableName => {
+      merged[variableName] = merged.templates[templateGroup][templateName][variableName];
     });
   }
 
-  vars.hasContainer = {};
-  applicationInfo.containers.forEach(applicationInfoContainerData => {
-    vars.hasContainer[applicationInfoContainerData.type] = true;
-  });
-
   vars.containers = [];
-  applicationInfo.containers.forEach(applicationInfoContainerData => {
-    const defaults = yaml.safeLoad(containerNunjucks.render(`${applicationInfoContainerData.type}.yml.j2`, vars));
-    const combined = mergeObjectsConcatArrays([defaults, applicationInfoContainerData]);
+  vars.hasContainer = {};
+  merged.containers.forEach(container => {
+    const defaults = yaml.safeLoad(fs.readFileSync(`${config.get('dataRepo:path')}/input/containers/${container.type}.yml`, {encoding: 'utf8'}));
+    const combined = mergeObjectsConcatArrays([defaults, container]);
+    const rendered = renderObject(combined, vars);
 
-    //Get Template Vars
-    if(combined.templates) {
-      Object.keys(combined.templates).map(templateGroupName => {
-        Object.keys(combined.templates[templateGroupName]).forEach(templateName => {
-          const envInfo = _.get(combined, `templates['${templateGroupName}']['${templateName}'].environmentOverrides['${environment}']`, {});
-          const defaultInfo = _.get(combined.templates[templateGroupName][templateName], 'default', {});
-
-          combined.templates[templateGroupName][templateName] = mergeObjectsConcatArrays([defaultInfo, envInfo]);
-        });
+    //Container level template variables
+    if(templateGroup && templateName && _.get(rendered, `templates.${templateGroup}.${templateName}`)) {
+      Object.keys(rendered.templates[templateGroup][templateName]).forEach(variableName => {
+        rendered[variableName] = rendered.templates[templateGroup][templateName][variableName];
       });
     }
 
-    vars.containers.push(combined);
+    vars.containers.push(rendered);
+    vars.hasContainer[container.type] = true;
   });
 
   return vars;
@@ -124,35 +117,13 @@ module.exports.getMaskedVariables = function getMaskedVariables(repoName, enviro
 /**
  * Render a template
  *
- * @param {string} templateGroup - the group name for the template
- * @param {string} templateName - template to render
+ * @param {string} template - template to render
  * @param {object} vars - variables
  * @return {string} - the rendered template
  */
-module.exports.renderTemplate = function renderTemplate(templateGroup, templateName, vars) {
-  init();
-
-  const templateRenderVars = getTemplateRenderVars(templateGroup, templateName, vars);
-
-  return nunjucks[templateGroup].render(templateName, templateRenderVars);
+module.exports.renderTemplate = function renderTemplate(template, vars) {
+  return nunjucks.render(template, vars);
 };
-
-function getTemplateRenderVars(templateGroup, templateName, vars) {
-  const newVars = JSON.parse(JSON.stringify(vars));
-
-  newVars.template = _.get(newVars, ['templates', templateGroup, templateName], {});
-
-  newVars.containers.forEach(container => {
-    container.template = _.get(container, ['templates', templateGroup, templateName], {});
-  });
-
-  console.log('VARS-----')
-  console.log('tg', templateGroup);
-  console.log('tn', templateName);
-  console.log(JSON.stringify(newVars))
-
-  return newVars;
-}
 
 /**
  * Render a container
@@ -182,7 +153,7 @@ function renderObject(obj, vars) {
       result[key] = obj[key];
     }
     else if(typeof obj[key] === 'string') {
-      result[key] = containerNunjucks.renderString(obj[key], vars);
+      result[key] = nunjucks2.renderString(obj[key], vars);
     } else if(Array.isArray(obj[key])) {
       result[key] = [];
       obj[key].forEach(item => {
@@ -199,7 +170,7 @@ function renderObject(obj, vars) {
 /**
  * Merge each member of the objectArray using _.merge except arrays which are concatenated
  *
- * @param {object[]} objectArray - array of objects to merge
+ * @param {[object]} objectArray - array of objects to merge
  * @param {object} combined - the value of the currently combined properties
  * @return {object} - the merged object
  */
@@ -210,24 +181,24 @@ function mergeObjectsConcatArrays(objectArray, combined = null) {
 
   Object.keys(combined).forEach(propertyName => {
     switch(true) {
-      case Array.isArray(combined[propertyName]):
+      case Array.isArray(combined[propertyName]) && !!combined[propertyName].length:
         const objectsWithProperty = objectArray.filter(obj => !!obj[propertyName]);
         const values = objectsWithProperty.map(obj => obj[propertyName]);
         const filteredValues = values.filter(Boolean);
         const flattened = _.flatten([...filteredValues]);
         const unique = _.uniq(flattened);
 
-        // //If it's an array of named objects, merge objects with same name
-        // if(unique.length && unique[0].name) {
-        //   combined[propertyName] = uniqueByName(unique);
-        // } else {
+        //If it's an array of named objects, merge objects with same name
+        if(unique.length && unique[0].name) {
+          combined[propertyName] = uniqueByName(unique);
+        } else {
           combined[propertyName] = unique;
-        // }
+        }
 
         break;
 
       case typeof combined[propertyName] === 'object':
-        mergeObjectsConcatArrays(objectArray.filter(obj => !!obj && !!obj[propertyName]).map(obj => obj[propertyName]), combined[propertyName]);
+        mergeObjectsConcatArrays(objectArray.filter(obj => !!obj[propertyName]).map(obj => obj[propertyName]), combined[propertyName]);
         break;
     }
   });
@@ -250,8 +221,3 @@ function uniqueByName(arrayOfObjects) {
 
   return Object.values(objFromArray);
 }
-
-module.exports.testing = {};
-module.exports.testing.mergeObjectsConcatArrays = mergeObjectsConcatArrays;
-module.exports.testing.getTemplateRenderVars = getTemplateRenderVars;
-// module.exports.testing.uniqueByName = uniqueByName;

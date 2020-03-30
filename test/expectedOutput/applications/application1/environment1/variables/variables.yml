@@ -1,0 +1,42 @@
+---
+# From global variables
+globalValue1: value1
+globalValue2OverriddenByEnvironment: value2a
+globalValue3OverriddenByApplication: value3a
+
+# Basic application info
+name: application1
+env: environment1
+
+# Containers
+containers:
+  - type: container1
+    name: application1-container1
+    port: 10000
+    serverFile: server.js
+
+    #Secrets
+    secrets:
+      - secret1
+
+    # Environment variables
+    environmentVariables:
+      - name: ENV1_OVERRIDDEN_BY_APPLICATION
+        value: env_val_1a
+      - name: ENV2_FROM_CONTAINER
+        value: env_val_2
+      - name: ENV3_FROM_APPLICATION
+        value: env_val_3
+
+    #Template Data
+    templateVal1FromContainer: val1
+    templateVal2FromApplication: val2
+    templateVal3OverriddenByApplication: val3b
+
+# hasContainer
+hasContainer:
+  container1: true
+
+# Application Level Template Data
+globalTemplateFromApplication: val1a
+globalTemplateFromApplication2: val2

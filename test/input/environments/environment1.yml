@@ -1,0 +1,21 @@
+var4: val4a
+var11: val11a
+var17: val17a
+var22: val22
+var23: val23
+var24: val24
+var25: val25
+var26: val26
+
+templates:
+  group1:
+    template1.yml:
+      var5: val5a
+      var12: val12a
+      var18: val18a
+      var23: val23a
+      var26: val26a
+      var27: val27
+      var28: val28
+      var29: val29
+      var30: val30

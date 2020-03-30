@@ -1,0 +1,4 @@
+name: application003
+
+containers:
+  - type: container002

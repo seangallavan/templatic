@@ -1,0 +1,66 @@
+---
+# From global variables
+var1: val1
+var2: val2
+var3: val3
+var4: val4
+var5: val5
+var6: val6
+var7: val7
+var8: val8
+var9: val9
+var10: val10a
+var11: val11a
+var12: val12a
+var13: val13a
+var14: val14a
+var15: val15a
+var16: val16
+var17: val17a
+var18: val18a
+var19: val19a
+var20: val20a
+var21: val21a
+var22: val22
+var23: val23a
+var24: val24a
+var25: val25a
+var26: val26a
+var27: val27
+var28: val28a
+var29: val29a
+var30: val30a
+var31: val31
+var32: val32a
+var33: val33a
+var34: val34
+var35: val35a
+var36: val36
+
+# From global templates
+globalTemplateFromApplication: val1
+
+# Containers
+containers:
+  - name: application1-container1-environemnt1
+    var41: val41
+    var42: val42a
+    var43: val43a
+    var44: val44a
+    var45: val45a
+    var46: val46a
+    var47: val47
+    var48: val48a
+    var49: val49a
+    var50: val50a
+    var51: val51a
+    var52: val52
+    var53: val53a
+    var54: val54a
+    var55: val55a
+    var56: val56
+    var57: val57a
+    var58: val58a
+    var59: val59
+    var60: val60a
+    var61: val61

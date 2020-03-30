@@ -1,0 +1,10 @@
+name: application008
+
+containers:
+  - type: container001
+
+templates:
+  templateGroup001:
+    template001.j2:
+      default:
+        var001: val001

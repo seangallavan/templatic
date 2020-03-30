@@ -9,6 +9,6 @@ const fs = require('fs-extra');
  */
 module.exports.getApplicationNames = function getApplicationNames() {
   return fs.readdirSync(`${__dirname}/../yaml/applications`)
-    .filter(filename => ! ['.', '..', 'defaults.yml'].includes(filename))
+    .filter(filename => ! ['.', '..'].includes(filename))
     .map(filename => filename.replace('.yml', ''));
 };
