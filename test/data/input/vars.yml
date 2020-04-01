@@ -1,1 +1,7 @@
 global001: value001
+
+templates:
+  templateGroup001:
+    template001:
+      default:
+        var002: val002

@@ -1,16 +1,10 @@
 'use strict';
 
-const yaml = require('js-yaml');
 const should = require('chai').should();
-const fs = require('fs');
 
 const render = require('../../lib/render');
 
 describe('lib/render.js', () => {
-  describe('uniqueByName', () => {
-
-  });
-
   describe('mergeObjectsConcatArrays', () => {
     const moca = render.testing.mergeObjectsConcatArrays;
 
@@ -135,93 +129,107 @@ describe('lib/render.js', () => {
   });
 
   describe('getVariables', () => {
-    describe('basic', () => {
-      let vars;
-
-      before('getVars', () => {
-        vars = render.getVariables('application001', 'environment001');
-      });
-
-      it('should have correct application info', () => {
-        vars.name.should.equal('application001');
-        vars.global001.should.equal('value001');
-        vars.region.should.equal('region001');
-        vars.hasContainer.container001.should.be.true;
-        vars.containers.length.should.equal(1);
-        vars.containers[0].name.should.equal('application001-container001');
-      });
-    });
-
-    describe('with templates', () => {
-      describe('all fields provided', () => {
+    describe('environment', () => {
+      describe('basic', () => {
         let vars;
 
         before('getVars', () => {
-          vars = render.getVariables('application002', 'environment001');
+          vars = render.getVariablesForEnvironment('application001', 'environment001');
         });
 
-        it('should have correct template info', () => {
-          vars.templates.templateGroup001['template001.j2'].var001.should.equal('val003');
-        });
-      });
-
-      describe('empty default field', () => {
-        let vars;
-
-        before('getVars', () => {
-          vars = render.getVariables('application004', 'environment001');
-        });
-
-        it('should have correct template info', () => {
-          vars.templates.templateGroup001['template001.j2'].var001.should.equal('val003');
+        it('should have correct application info', () => {
+          vars.name.should.equal('application001');
+          vars.global001.should.equal('value001');
+          vars.region.should.equal('region001');
+          vars.hasContainer.container001.should.be.true;
+          vars.containers.length.should.equal(1);
+          vars.containers[0].name.should.equal('application001-container001');
         });
       });
 
-      describe('no default field', () => {
+      describe('environment inherits', () => {
         let vars;
 
         before('getVars', () => {
-          vars = render.getVariables('application005', 'environment001');
+          vars = render.getVariablesForEnvironment('application001', 'environment002');
         });
 
-        it('should have correct template info', () => {
-          vars.templates.templateGroup001['template001.j2'].var001.should.equal('val003');
+        it('should have correct application info', () => {
+          vars.env.should.equal('env002');
         });
       });
 
-      describe('env override present but empty', () => {
-        let vars;
+      describe('with templates', () => {
+        describe('all fields provided', () => {
+          let vars;
 
-        before('getVars', () => {
-          vars = render.getVariables('application006', 'environment001');
+          before('getVars', () => {
+            vars = render.getVariablesForEnvironment('application002', 'environment001');
+          });
+
+          it('should have correct template info', () => {
+            vars.templates.templateGroup001['template001.j2'].var001.should.equal('val003');
+          });
         });
 
-        it('should have correct template info', () => {
-          vars.templates.templateGroup001['template001.j2'].var001.should.equal('val001');
-        });
-      });
+        describe('empty default field', () => {
+          let vars;
 
-      describe('environment not present in overrides', () => {
-        let vars;
+          before('getVars', () => {
+            vars = render.getVariablesForEnvironment('application004', 'environment001');
+          });
 
-        before('getVars', () => {
-          vars = render.getVariables('application007', 'environment001');
-        });
-
-        it('should have correct template info', () => {
-          vars.templates.templateGroup001['template001.j2'].var001.should.equal('val001');
-        });
-      });
-
-      describe('environmentOverrides not present', () => {
-        let vars;
-
-        before('getVars', () => {
-          vars = render.getVariables('application008', 'environment001');
+          it('should have correct template info', () => {
+            vars.templates.templateGroup001['template001.j2'].var001.should.equal('val003');
+          });
         });
 
-        it('should have correct template info', () => {
-          vars.templates.templateGroup001['template001.j2'].var001.should.equal('val001');
+        describe('no default field', () => {
+          let vars;
+
+          before('getVars', () => {
+            vars = render.getVariablesForEnvironment('application005', 'environment001');
+          });
+
+          it('should have correct template info', () => {
+            vars.templates.templateGroup001['template001.j2'].var001.should.equal('val003');
+          });
+        });
+
+        describe('env override present but empty', () => {
+          let vars;
+
+          before('getVars', () => {
+            vars = render.getVariablesForEnvironment('application006', 'environment001');
+          });
+
+          it('should have correct template info', () => {
+            vars.templates.templateGroup001['template001.j2'].var001.should.equal('val001');
+          });
+        });
+
+        describe('environment not present in overrides', () => {
+          let vars;
+
+          before('getVars', () => {
+            vars = render.getVariablesForEnvironment('application007', 'environment001');
+          });
+
+          it('should have correct template info', () => {
+            vars.templates.templateGroup001['template001.j2'].var001.should.equal('val001');
+          });
+        });
+
+        describe('environmentOverrides not present', () => {
+          let vars;
+
+          before('getVars', () => {
+            vars = render.getVariablesForEnvironment('application008', 'environment001');
+          });
+
+          it('should have correct template info', () => {
+            vars.templates.templateGroup001['template001.j2'].var001.should.equal('val001');
+          });
         });
       });
     });
@@ -232,11 +240,12 @@ describe('lib/render.js', () => {
       let templateRenderVars;
 
       before('getVars', () => {
-        const vars = render.getVariables('application008', 'environment001');
+        const vars = render.getVariablesForEnvironment('application008', 'environment001');
         templateRenderVars = render.testing.getTemplateRenderVars('templateGroup001', 'template001.j2', vars);
       });
 
       it('should have template property', () => {
+        console.log(templateRenderVars);
         templateRenderVars.template.var001.should.equal('val001');
       });
     });
@@ -245,7 +254,7 @@ describe('lib/render.js', () => {
       let templateRenderVars;
 
       before('getVars', () => {
-        const vars = render.getVariables('application009', 'environment001');
+        const vars = render.getVariablesForEnvironment('application009', 'environment001');
         templateRenderVars = render.testing.getTemplateRenderVars('templateGroup001', 'template001.j2', vars);
       });
 
@@ -260,8 +269,8 @@ describe('lib/render.js', () => {
       let rendered;
 
       before('getVars', () => {
-        const vars = render.getVariables('application001', 'environment001');
-        rendered = render.renderTemplate('templateGroup001', 'template001.j2', vars);
+        const vars = render.getVariablesForEnvironment('application001', 'environment001');
+        rendered = render.renderTemplate('application', 'templateGroup001', 'template001.j2', vars);
       });
 
       it('should render correctly', () => {
@@ -275,7 +284,7 @@ describe('lib/render.js', () => {
     let vars;
 
     before('getVars', () => {
-      vars = render.getVariables('application003', 'environment001');
+      vars = render.getVariablesForEnvironment('application003', 'environment001');
     });
 
     it('should have correct container template info', () => {
