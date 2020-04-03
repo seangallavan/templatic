@@ -31,6 +31,11 @@ exports.handler = argv => {
     process.exit(1);
   }
 
+  if(argv.templateName && !argv.templateGroup) {
+    console.log('You must specify a templateGroup if specifying a templateName');
+    process.exit(1);
+  }
+
   if(argv.dataDir) {
     config.set('dataRepo:path', argv.dataDir);
   }
@@ -56,7 +61,7 @@ exports.handler = argv => {
 
           const renderedText = render.renderTemplate(TEMPLATE_TYPE, templateGroup, templateFilename, vars);
 
-          data.saveRenderedTemplate(appName, TEMPLATE_TYPE, templateGroup, templateFilename, environment, renderedText);
+          data.saveRenderedATemplate(appName, TEMPLATE_TYPE, templateGroup, templateFilename, environment, renderedText);
         });
       });
     });

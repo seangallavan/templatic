@@ -8,7 +8,7 @@ const TEMPLATE_TYPE = 'application';
 
 exports.command = 'application <appName> [-e envName] [-g templateGroup] [-n templateName] [-d dataDir]';
 
-exports.desc = 'Generate environment templates';
+exports.desc = 'Generate application templates';
 
 exports.builder = {
   envName: {
@@ -27,6 +27,11 @@ exports.builder = {
 
 exports.handler = argv => {
   if(argv.templateName && !argv.templateGroup) {
+    console.log('You must specify a templateGroup if specifying a templateName');
+    process.exit(1);
+  }
+
+  if(argv.appNames && !argv.templateGroup) {
     console.log('You must specify a templateGroup if specifying a templateName');
     process.exit(1);
   }

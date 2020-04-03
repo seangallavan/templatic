@@ -6,7 +6,7 @@ const should = require('chai').should();
 
 const config = require('../../../config');
 
-describe('commands/generate/application', () => {
+describe.skip('commands/generate/application', () => {
   describe('basic', () => {
     let generated;
 
