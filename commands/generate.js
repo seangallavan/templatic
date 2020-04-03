@@ -1,6 +1,5 @@
 'use strict';
 
-const config = require('../config');
 const data = require('../lib/data');
 const render = require('../lib/render');
 
@@ -43,7 +42,7 @@ exports.handler = argv => {
     const templates = argv.templateGroups ? argv.templateGroups.split(',') : data.getTemplateNamesInGroup(templateGroup);
 
     templates.forEach(template => {
-      render.renderTemplates(templateGroup, template, metadata.outputDirectoryHierarchy, `${config.get('dataRepo:path')}/output/${templateGroup}/${template}`);
+      render.renderTemplates(templateGroup, template, metadata.outputDirectoryHierarchy, `${data.getDataPath()}/output/${templateGroup}/${template}`);
     });
   });
   //

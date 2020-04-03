@@ -2,7 +2,6 @@
 
 const data = require('../../lib/data');
 const render = require('../../lib/render');
-const config = require('../../config');
 
 const TEMPLATE_TYPE = 'application';
 

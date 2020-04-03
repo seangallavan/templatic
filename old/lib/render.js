@@ -14,7 +14,7 @@ const nunjucks2 = new Nunjucks.Environment(
 );
 
 function init() {
-  fs.readdirSync(`${config.get('dataRepo:path')}/templates`).forEach(categoryDir => {
+  fs.readdirSync(`${data.getDataPath()}/templates`).forEach(categoryDir => {
     if(['.', '..'].includes(categoryDir)) {
       return;
     }
@@ -23,13 +23,13 @@ function init() {
       nunjucks[categoryDir] = {};
     }
 
-    fs.readdirSync(`${config.get('dataRepo:path')}/templates/${categoryDir}`).forEach(groupDir => {
+    fs.readdirSync(`${data.getDataPath()}/templates/${categoryDir}`).forEach(groupDir => {
       if(['.', '..'].includes(groupDir)) {
         return;
       }
 
       nunjucks[categoryDir][groupDir] = new Nunjucks.Environment(
-        new Nunjucks.FileSystemLoader(`${config.get('dataRepo:path')}/templates/${categoryDir}/${groupDir}`)
+        new Nunjucks.FileSystemLoader(`${data.getDataPath()}/templates/${categoryDir}/${groupDir}`)
       );
     });
   });
@@ -42,9 +42,9 @@ function init() {
  * @return {object} - variables object
  */
 module.exports.getVariables = function getVariables(repoName, environment, templateGroup = null, templateName = null) {
-  const applicationInfo = yaml.safeLoad(fs.readFileSync(`${config.get('dataRepo:path')}/input/applications/${repoName}.yml`, 'utf8'));
-  const environmentInfo = yaml.safeLoad(fs.readFileSync(`${config.get('dataRepo:path')}/input/environments/${environment}.yml`, 'utf8'));
-  const globalInfo = yaml.safeLoad(fs.readFileSync(`${config.get('dataRepo:path')}/input/global/config.yml`, 'utf8'));
+  const applicationInfo = yaml.safeLoad(fs.readFileSync(`${data.getDataPath()}/input/applications/${repoName}.yml`, 'utf8'));
+  const environmentInfo = yaml.safeLoad(fs.readFileSync(`${data.getDataPath()}/input/environments/${environment}.yml`, 'utf8'));
+  const globalInfo = yaml.safeLoad(fs.readFileSync(`${data.getDataPath()}/input/global/config.yml`, 'utf8'));
 
   const merged = mergeObjectsConcatArrays([globalInfo, environmentInfo, applicationInfo]);
   const vars = _.omit(merged, ['containers', 'templates']);
@@ -63,7 +63,7 @@ module.exports.getVariables = function getVariables(repoName, environment, templ
   vars.containers = [];
   vars.hasContainer = {};
   merged.containers.forEach(container => {
-    const defaults = yaml.safeLoad(fs.readFileSync(`${config.get('dataRepo:path')}/input/containers/${container.type}.yml`, {encoding: 'utf8'}));
+    const defaults = yaml.safeLoad(fs.readFileSync(`${data.getDataPath()}/input/containers/${container.type}.yml`, {encoding: 'utf8'}));
     const combined = mergeObjectsConcatArrays([defaults, container]);
     const rendered = renderObject(combined, vars);
 

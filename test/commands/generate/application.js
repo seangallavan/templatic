@@ -4,7 +4,7 @@ const {execSync} = require('child_process');
 const fs = require('fs');
 const should = require('chai').should();
 
-const config = require('../../../config');
+const data = require('../../../lib/data');
 
 describe.skip('commands/generate/application', () => {
   describe('basic', () => {
@@ -15,7 +15,7 @@ describe.skip('commands/generate/application', () => {
     });
 
     before('get generated', () => {
-      generated = fs.readFileSync(`${config.get('dataRepo:path')}/output/applications/application001/environment001/templateGroup001/template001`, {encoding: 'utf8'});
+      generated = fs.readFileSync(`${data.getDataPath()}/output/applications/application001/environment001/templateGroup001/template001`, {encoding: 'utf8'});
     });
 
     it('should generate correctly', () => {

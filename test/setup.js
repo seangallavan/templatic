@@ -1,5 +1,5 @@
 'use strict';
 
-const config = require('../config');
+const data = require('../lib/data');
 
-config.set('dataRepo:path', `${__dirname}/data`);
+data.setDataPath(`${__dirname}/data`);
