@@ -15,7 +15,6 @@ describe.skip('lib/render.js', () => {
       });
 
       it('should have template property', () => {
-        console.log(templateRenderVars);
         templateRenderVars.template.var001.should.equal('val001');
       });
     });
