@@ -1,0 +1,9 @@
+---
+outputDirectoryHierarchy:
+  - application
+  - environment
+tidyOutput: true
+
+templates:
+  template001.j2:
+    executable: true

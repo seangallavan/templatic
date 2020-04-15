@@ -6,6 +6,6 @@ containers:
 templates:
   templateGroup001:
     template001.j2:
-      environmentOverrides:
+      environments:
         environment001:
           var001: val003

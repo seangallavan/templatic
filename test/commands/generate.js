@@ -4,18 +4,18 @@ const {execSync} = require('child_process');
 const fs = require('fs');
 const should = require('chai').should();
 
-const data = require('../../../lib/data');
+const data = require('../../lib/data');
 
-describe.skip('commands/generate/application', () => {
+describe('commands/generate', () => {
   describe('basic', () => {
     let generated;
 
     before('generate', () => {
-      execSync(`node run.js generate application application001 -d ${__dirname}/../../data`);
+      execSync(`${__dirname}/../../cli generate -a application001 -d ${__dirname}/../data`);
     });
 
     before('get generated', () => {
-      generated = fs.readFileSync(`${data.getDataPath()}/output/applications/application001/environment001/templateGroup001/template001`, {encoding: 'utf8'});
+      generated = fs.readFileSync(`${data.getDataPath()}/output/templateGroup001/application001/environment001/template001`, {encoding: 'utf8'});
     });
 
     it('should generate correctly', () => {

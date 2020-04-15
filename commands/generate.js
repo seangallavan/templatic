@@ -2,8 +2,9 @@
 
 const data = require('../lib/data');
 const render = require('../lib/render');
+const variables = require('../lib/variables');
 
-exports.command = 'generate [-a appNames] [-e envNames] [-g templateGroupNames] [-n templateNames] [-d dataDir]';
+exports.command = 'generate [-a appNames] [-e envNames] [-c containerNames] [-g templateGroupNames] [-n templateNames] [-d dataDir]';
 
 exports.desc = 'Generate templates';
 
@@ -13,6 +14,9 @@ exports.builder = {
   },
   envNames: {
     alias: 'e'
+  },
+  containerNames: {
+    alias: 'c'
   },
   templateGroups: {
     alias: 'g'
@@ -26,47 +30,38 @@ exports.builder = {
 };
 
 exports.handler = argv => {
-  if(argv.dataDir) {
-    config.set('dataRepo:path', argv.dataDir);
-  }
+  data.setDataPath(argv.dataDir ? argv.dataDir : process.cwd());
 
-  const applications = argv.appNames ? argv.appNames.split(',') : data.getApplicationNames();
-  const environments = argv.envNames ? argv.envNames.split(',') : data.getEnvironmentNames();
-  const templateGroups = argv.templateGroups ? argv.templateGroups.split(',') : data.getTemplateGroupNames();
-  const containers = argv.containers ? argv.containers.split(',') : data.getContainerNames();
+  const scope = {
+    applications: argv.appNames ? argv.appNames.split(',') : data.getApplicationNames(),
+    environments: argv.envNames ? argv.envNames.split(',') : data.getEnvironmentNames(),
+    templateGroups: argv.templateGroups ? argv.templateGroups.split(',') : data.getTemplateGroupNames(),
+    containers: argv.containerNames ? argv.containerNames.split(',') : data.getContainerNames(),
+    templateNames: argv.templateNames ? argv.templateNames.split(',') : null,
+  };
 
-  const vars = render.getVariables(applications);
+  const vars = variables.getVariables(scope.applications);
 
-  templateGroups.forEach(templateGroup => {
-    const metadata = data.getTemplateMetadata(templateGroup);
-    const templates = argv.templateGroups ? argv.templateGroups.split(',') : data.getTemplateNamesInGroup(templateGroup);
+  scope.templateGroups.forEach(templateGroup => {
+    const outputDirectoryHierarchy = data.getOutputDirectoryHierarchy(templateGroup);
+    const templateNames = scope.templateNames ? scope.templateNames.split(',') : data.getTemplateNamesInGroup(templateGroup);
+    if(argv.appNames && !outputDirectoryHierarchy.includes('application')) {
+      console.log('Unable to process a template group which requires all applications when specifying a list');
+      process.exit(1);
+    }
 
-    templates.forEach(template => {
-      render.renderTemplates(templateGroup, template, metadata.outputDirectoryHierarchy, `${data.getDataPath()}/output/${templateGroup}/${template}`);
+    if(argv.envNames && !outputDirectoryHierarchy.includes('environment')) {
+      console.log('Unable to process a template group which requires all environments when specifying a list');
+      process.exit(1);
+    }
+
+    if(argv.containerNames && !outputDirectoryHierarchy.includes('containers')) {
+      console.log('Unable to process a template group which requires all containers when specifying a list');
+      process.exit(1);
+    }
+
+    templateNames.forEach(templateName => {
+      render.renderTemplate(templateGroup, templateName, outputDirectoryHierarchy, `${data.getDataPath()}/output`, vars, scope);
     });
   });
-  //
-  // appNames.forEach(appName => {
-  //   console.log(`Processing ${appName}...`);
-  //
-  //
-  //
-  //   //Application templates
-  //
-  //   environments.forEach(environment => {
-  //
-  //     templateGroups.forEach(templateGroup => {
-  //       data.getTemplateNamesInGroup(TEMPLATE_TYPE, templateGroup).forEach(templateFilename => {
-  //         if(templateName && templateName !== templateFilename) {
-  //           return;
-  //         }
-  //
-  //         const renderedText = render.renderTemplate(TEMPLATE_TYPE, templateGroup, templateFilename, vars);
-  //
-  //         data.saveRenderedTemplate(appName, TEMPLATE_TYPE, templateGroup, templateFilename, environment, renderedText);
-  //       });
-  //     });
-  //   });
-  // });
-  //
 };

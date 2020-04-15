@@ -1,3 +1,4 @@
 inherits: environment001
 
-env: env002
+varOverridden: valOverridden2
+varRegular2: valRegular2

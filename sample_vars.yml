@@ -1,0 +1,100 @@
+renderVars:
+  allApplications:
+    - name: application010
+      hasContainer:
+
+  allEnvironments:
+    - varOverridden: valOverridden
+      varRegular: valRegular
+      varInherited: valInherited
+    - varOverridden: valOverridden2
+      varRegular: valRegular
+      varInherited: valInherited
+      inherits: environment001
+      varRegular2: valRegular2
+
+  allContainers:
+    - name: application001-container001
+      template:
+    - name: application001-container002
+      template:
+        var002: val003
+      templates:
+        templateGroup001:
+          template001.j2:
+            default:
+              var001: val001
+            environment001:
+              var002: val003
+
+  allContainersByName:
+    application001-container001:
+      template:
+    application001-container002:
+      template:
+        var002: val003
+      templates:
+        templateGroup001:
+          template001.j2:
+            default:
+              var001: val001
+            environment001:
+              var002: val003
+
+  global001: value001
+  name: application001
+
+  template:
+    var002: val002
+
+  hasContainer:
+    container002: true
+
+  containers:
+    - name: "application001-container002"
+      var1: val1
+      template:
+        var001: val003
+      templates:
+        templateGroup001:
+          "template001.j2":
+            default:
+              var001: val001
+            environment001:
+              var001: val003
+
+  environments:
+    - varOverridden: valOverridden2
+      varRegular: valRegular
+      varInherited: valInherited
+      inherits: environment001
+      varRegular2: valRegular2
+
+allApplications:
+  application001:
+    name: application001
+    hasContainer:
+
+allEnvironments:
+  environment001:
+    varOverridden: valOverridden
+    varRegular: valRegular
+    varInherited: valInherited
+  environment002:
+    varOverridden: valOverridden2
+    varRegular: valRegular
+    varInherited: valInherited
+    inherits: environment001
+    varRegular2: valRegular2
+
+allContainerTemplates:
+  container001: "name: {{ name }}-container001"
+  container002: "name: {{ name }}-container002\n\ntemplates:\n  templateGroup001:\n    template001.j2:\n      default:\n        var001: val001\n      environments:\n        environment001:\n          var001: val003"
+
+global:
+  global001: value001
+  templates:
+    templateGroup001:
+      "template001.j2":
+        default:
+          var002: val002

@@ -7,6 +7,6 @@ templates:
   templateGroup001:
     template001.j2:
       default:
-      environmentOverrides:
+      environments:
         environment001:
           var001: val003

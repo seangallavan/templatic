@@ -1,0 +1,9 @@
+name: application010
+
+containers:
+  - container: container002
+    var1: val1
+
+environments:
+  - environment: environment002
+    var2: val2
