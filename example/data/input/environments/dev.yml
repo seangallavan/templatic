@@ -1,0 +1,4 @@
+---
+env: dev
+region: us-east-1
+ecrAddress: 012345677.dkr.ecr.us-east-1.amazonaws.com

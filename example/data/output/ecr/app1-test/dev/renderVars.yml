@@ -1,0 +1,656 @@
+global001: value001
+templates:
+  templateGroup001:
+    template001.j2:
+      default:
+        var002: val002
+allContainers:
+  - name: '-nginx'
+    port: 3030
+    docker:
+      repoName: '-nginx'
+      dockerfileName: Dockerfile-nginx
+    templates:
+      kubernetes:
+        deployment.yml.j2:
+          default:
+            volumeMounts:
+              - name: node
+                mountPath: /logs
+              - name: august-runtime-creds-volume
+                mountPath: /root/august-runtime-creds
+            hostAliases:
+              - ip: 127.0.0.1
+                hostnames:
+                  - null
+            requests:
+              cpu: 25m
+              memory: 100Mi
+            limits:
+              memory: 200Mi
+            readinessProbe:
+              httpGet:
+                path: /ping
+                scheme: HTTPS
+                port: 443
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+            livenessProbe:
+              httpGet:
+                path: /ping
+                scheme: HTTPS
+                port: 443
+              initialDelaySeconds: 10
+              periodSeconds: 3
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+    type: nodejs
+    template: {}
+  - name: null
+    port: 10000
+    serverFile: server.js
+    docker:
+      repoName: null
+      dockerfileName: Dockerfile-nodejs
+    env:
+      - name: NODE_ENV
+        value: null
+      - name: CLUSTER_MODE_DISABLED
+        value: '1'
+    templates:
+      kubernetes:
+        deployment.yml.j2:
+          default:
+            env:
+              - name: NODE_ENV
+                value: null
+              - name: CLUSTER_MODE_DISABLED
+                value: '1'
+            volumeMounts:
+              - name: node
+                mountPath: /logs
+              - name: august-runtime-creds-volume
+                mountPath: /root/august-runtime-creds
+            requests:
+              cpu: 25m
+              memory: 100Mi
+            limits:
+              memory: 200Mi
+            readinessProbe:
+              httpGet:
+                path: /health
+                scheme: HTTP
+                port: null
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+            livenessProbe:
+              httpGet:
+                path: /health
+                scheme: HTTP
+                port: null
+              initialDelaySeconds: 10
+              periodSeconds: 3
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+    type: nginx
+    template: {}
+  - name: ''
+    type: static
+    port: 443
+    docker:
+      repoName: ''
+      dockerfileName: Dockerfile-nginx
+    templates:
+      kubernetes:
+        deployment.yml.j2:
+          volumeMounts:
+            - name: august-runtime-creds-volume
+              mountPath: /root/august-runtime-creds
+    kubernetes:
+      deployment:
+        spec:
+          template:
+            containers:
+              env:
+                - name: VUE_APP_AUGUST_NODE_ENV
+                  value: ''
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 50Mi
+                limits:
+                  memory: 150Mi
+              volumeMounts:
+                - name: logs
+                  mountPath: /logs
+              readinessProbe:
+                tcpSocket:
+                  port: 443
+                initialDelaySeconds: 5
+                periodSeconds: 10
+              livenessProbe:
+                tcpSocket:
+                  port: 443
+                initialDelaySeconds: 15
+                periodSeconds: 20
+    template: {}
+allContainersByName:
+  nginx:
+    name: '-nginx'
+    port: 3030
+    docker:
+      repoName: '-nginx'
+      dockerfileName: Dockerfile-nginx
+    templates:
+      kubernetes:
+        deployment.yml.j2:
+          default:
+            volumeMounts:
+              - name: node
+                mountPath: /logs
+              - name: august-runtime-creds-volume
+                mountPath: /root/august-runtime-creds
+            hostAliases:
+              - ip: 127.0.0.1
+                hostnames:
+                  - null
+            requests:
+              cpu: 25m
+              memory: 100Mi
+            limits:
+              memory: 200Mi
+            readinessProbe:
+              httpGet:
+                path: /ping
+                scheme: HTTPS
+                port: 443
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+            livenessProbe:
+              httpGet:
+                path: /ping
+                scheme: HTTPS
+                port: 443
+              initialDelaySeconds: 10
+              periodSeconds: 3
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+    type: nodejs
+    template: {}
+  nodejs:
+    name: null
+    port: 10000
+    serverFile: server.js
+    docker:
+      repoName: null
+      dockerfileName: Dockerfile-nodejs
+    env:
+      - name: NODE_ENV
+        value: null
+      - name: CLUSTER_MODE_DISABLED
+        value: '1'
+    templates:
+      kubernetes:
+        deployment.yml.j2:
+          default:
+            env:
+              - name: NODE_ENV
+                value: null
+              - name: CLUSTER_MODE_DISABLED
+                value: '1'
+            volumeMounts:
+              - name: node
+                mountPath: /logs
+              - name: august-runtime-creds-volume
+                mountPath: /root/august-runtime-creds
+            requests:
+              cpu: 25m
+              memory: 100Mi
+            limits:
+              memory: 200Mi
+            readinessProbe:
+              httpGet:
+                path: /health
+                scheme: HTTP
+                port: null
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+            livenessProbe:
+              httpGet:
+                path: /health
+                scheme: HTTP
+                port: null
+              initialDelaySeconds: 10
+              periodSeconds: 3
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+    type: nginx
+    template: {}
+  static:
+    name: ''
+    type: static
+    port: 443
+    docker:
+      repoName: ''
+      dockerfileName: Dockerfile-nginx
+    templates:
+      kubernetes:
+        deployment.yml.j2:
+          volumeMounts:
+            - name: august-runtime-creds-volume
+              mountPath: /root/august-runtime-creds
+    kubernetes:
+      deployment:
+        spec:
+          template:
+            containers:
+              env:
+                - name: VUE_APP_AUGUST_NODE_ENV
+                  value: ''
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 50Mi
+                limits:
+                  memory: 150Mi
+              volumeMounts:
+                - name: logs
+                  mountPath: /logs
+              readinessProbe:
+                tcpSocket:
+                  port: 443
+                initialDelaySeconds: 5
+                periodSeconds: 10
+              livenessProbe:
+                tcpSocket:
+                  port: 443
+                initialDelaySeconds: 15
+                periodSeconds: 20
+    template: {}
+allApplications:
+  - name: app1-test
+    containers:
+      - type: nodejs
+        port: 3030
+      - type: nginx
+    hasContainer:
+      undefined: true
+    hasEnvironment: {}
+    template: {}
+allApplicationsByName:
+  app1-test:
+    name: app1-test
+    containers:
+      - type: nodejs
+        port: 3030
+      - type: nginx
+    hasContainer:
+      undefined: true
+    hasEnvironment: {}
+    template: {}
+allEnvironments:
+  - env: dev-canary
+    region: us-east-1
+    ecrAddress: 012345677.dkr.ecr.us-east-1.amazonaws.com
+    inherits: dev
+    template: {}
+  - env: dev
+    region: us-east-1
+    ecrAddress: 012345677.dkr.ecr.us-east-1.amazonaws.com
+    template: {}
+  - env: prod-canary
+    region: us-west-2
+    ecrAddress: 012345677.dkr.ecr.us-west-2.amazonaws.com
+    inherits: prod
+    template: {}
+  - env: prod
+    region: us-west-2
+    ecrAddress: 012345677.dkr.ecr.us-west-2.amazonaws.com
+    template: {}
+  - env: stage-canary
+    region: us-west-2
+    ecrAddress: 012345677.dkr.ecr.us-west-2.amazonaws.com
+    inherits: stage
+    template: {}
+  - env: stage
+    region: us-west-2
+    ecrAddress: 012345677.dkr.ecr.us-west-2.amazonaws.com
+    template: {}
+allEnvironmentsByName:
+  dev-canary:
+    env: dev-canary
+    region: us-east-1
+    ecrAddress: 012345677.dkr.ecr.us-east-1.amazonaws.com
+    inherits: dev
+    template: {}
+  dev:
+    env: dev
+    region: us-east-1
+    ecrAddress: 012345677.dkr.ecr.us-east-1.amazonaws.com
+    template: {}
+  prod-canary:
+    env: prod-canary
+    region: us-west-2
+    ecrAddress: 012345677.dkr.ecr.us-west-2.amazonaws.com
+    inherits: prod
+    template: {}
+  prod:
+    env: prod
+    region: us-west-2
+    ecrAddress: 012345677.dkr.ecr.us-west-2.amazonaws.com
+    template: {}
+  stage-canary:
+    env: stage-canary
+    region: us-west-2
+    ecrAddress: 012345677.dkr.ecr.us-west-2.amazonaws.com
+    inherits: stage
+    template: {}
+  stage:
+    env: stage
+    region: us-west-2
+    ecrAddress: 012345677.dkr.ecr.us-west-2.amazonaws.com
+    template: {}
+containers:
+  - name: '-nginx'
+    port: 3030
+    docker:
+      repoName: '-nginx'
+      dockerfileName: Dockerfile-nginx
+    templates:
+      kubernetes:
+        deployment.yml.j2:
+          default:
+            volumeMounts:
+              - name: node
+                mountPath: /logs
+              - name: august-runtime-creds-volume
+                mountPath: /root/august-runtime-creds
+            hostAliases:
+              - ip: 127.0.0.1
+                hostnames:
+                  - null
+            requests:
+              cpu: 25m
+              memory: 100Mi
+            limits:
+              memory: 200Mi
+            readinessProbe:
+              httpGet:
+                path: /ping
+                scheme: HTTPS
+                port: 443
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+            livenessProbe:
+              httpGet:
+                path: /ping
+                scheme: HTTPS
+                port: 443
+              initialDelaySeconds: 10
+              periodSeconds: 3
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+    type: nodejs
+    template: {}
+  - name: null
+    port: 10000
+    serverFile: server.js
+    docker:
+      repoName: null
+      dockerfileName: Dockerfile-nodejs
+    env:
+      - name: NODE_ENV
+        value: null
+      - name: CLUSTER_MODE_DISABLED
+        value: '1'
+    templates:
+      kubernetes:
+        deployment.yml.j2:
+          default:
+            env:
+              - name: NODE_ENV
+                value: null
+              - name: CLUSTER_MODE_DISABLED
+                value: '1'
+            volumeMounts:
+              - name: node
+                mountPath: /logs
+              - name: august-runtime-creds-volume
+                mountPath: /root/august-runtime-creds
+            requests:
+              cpu: 25m
+              memory: 100Mi
+            limits:
+              memory: 200Mi
+            readinessProbe:
+              httpGet:
+                path: /health
+                scheme: HTTP
+                port: null
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+            livenessProbe:
+              httpGet:
+                path: /health
+                scheme: HTTP
+                port: null
+              initialDelaySeconds: 10
+              periodSeconds: 3
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+    type: nginx
+    template: {}
+  - name: ''
+    type: static
+    port: 443
+    docker:
+      repoName: ''
+      dockerfileName: Dockerfile-nginx
+    templates:
+      kubernetes:
+        deployment.yml.j2:
+          volumeMounts:
+            - name: august-runtime-creds-volume
+              mountPath: /root/august-runtime-creds
+    kubernetes:
+      deployment:
+        spec:
+          template:
+            containers:
+              env:
+                - name: VUE_APP_AUGUST_NODE_ENV
+                  value: ''
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 50Mi
+                limits:
+                  memory: 150Mi
+              volumeMounts:
+                - name: logs
+                  mountPath: /logs
+              readinessProbe:
+                tcpSocket:
+                  port: 443
+                initialDelaySeconds: 5
+                periodSeconds: 10
+              livenessProbe:
+                tcpSocket:
+                  port: 443
+                initialDelaySeconds: 15
+                periodSeconds: 20
+    template: {}
+containersByName:
+  nginx:
+    name: '-nginx'
+    port: 3030
+    docker:
+      repoName: '-nginx'
+      dockerfileName: Dockerfile-nginx
+    templates:
+      kubernetes:
+        deployment.yml.j2:
+          default:
+            volumeMounts:
+              - name: node
+                mountPath: /logs
+              - name: august-runtime-creds-volume
+                mountPath: /root/august-runtime-creds
+            hostAliases:
+              - ip: 127.0.0.1
+                hostnames:
+                  - null
+            requests:
+              cpu: 25m
+              memory: 100Mi
+            limits:
+              memory: 200Mi
+            readinessProbe:
+              httpGet:
+                path: /ping
+                scheme: HTTPS
+                port: 443
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+            livenessProbe:
+              httpGet:
+                path: /ping
+                scheme: HTTPS
+                port: 443
+              initialDelaySeconds: 10
+              periodSeconds: 3
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+    type: nodejs
+    template: {}
+  nodejs:
+    name: null
+    port: 10000
+    serverFile: server.js
+    docker:
+      repoName: null
+      dockerfileName: Dockerfile-nodejs
+    env:
+      - name: NODE_ENV
+        value: null
+      - name: CLUSTER_MODE_DISABLED
+        value: '1'
+    templates:
+      kubernetes:
+        deployment.yml.j2:
+          default:
+            env:
+              - name: NODE_ENV
+                value: null
+              - name: CLUSTER_MODE_DISABLED
+                value: '1'
+            volumeMounts:
+              - name: node
+                mountPath: /logs
+              - name: august-runtime-creds-volume
+                mountPath: /root/august-runtime-creds
+            requests:
+              cpu: 25m
+              memory: 100Mi
+            limits:
+              memory: 200Mi
+            readinessProbe:
+              httpGet:
+                path: /health
+                scheme: HTTP
+                port: null
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+            livenessProbe:
+              httpGet:
+                path: /health
+                scheme: HTTP
+                port: null
+              initialDelaySeconds: 10
+              periodSeconds: 3
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+    type: nginx
+    template: {}
+  static:
+    name: ''
+    type: static
+    port: 443
+    docker:
+      repoName: ''
+      dockerfileName: Dockerfile-nginx
+    templates:
+      kubernetes:
+        deployment.yml.j2:
+          volumeMounts:
+            - name: august-runtime-creds-volume
+              mountPath: /root/august-runtime-creds
+    kubernetes:
+      deployment:
+        spec:
+          template:
+            containers:
+              env:
+                - name: VUE_APP_AUGUST_NODE_ENV
+                  value: ''
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 50Mi
+                limits:
+                  memory: 150Mi
+              volumeMounts:
+                - name: logs
+                  mountPath: /logs
+              readinessProbe:
+                tcpSocket:
+                  port: 443
+                initialDelaySeconds: 5
+                periodSeconds: 10
+              livenessProbe:
+                tcpSocket:
+                  port: 443
+                initialDelaySeconds: 15
+                periodSeconds: 20
+    template: {}
+name: app1-test
+hasContainer:
+  undefined: true
+hasEnvironment: {}
+template: {}
+env: dev-canary
+region: us-east-1
+ecrAddress: 012345677.dkr.ecr.us-east-1.amazonaws.com
+inherits: dev

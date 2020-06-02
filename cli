@@ -6,7 +6,5 @@ const path = require('path');
 
 const yargsUtil = require('./lib/yargs');
 
-console.log('AAAAAA', process.argv);
-
 yargsUtil.demandCommand(yargs, path.join(__dirname, './commands'))
   .argv;

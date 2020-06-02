@@ -1,0 +1,5 @@
+---
+inherits: prod
+
+#overrides
+env: prod-canary

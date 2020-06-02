@@ -1,0 +1,5 @@
+---
+inherits: stage
+
+#overrides
+env: stage-canary

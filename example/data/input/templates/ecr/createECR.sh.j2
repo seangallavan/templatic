@@ -1,0 +1,12 @@
+#!/bin/bash
+set -eux
+
+{% for container in containers %}
+{% if container.docker.repoName is defined %}
+  aws ecr describe-repositories --region {{ region }} --repository-names {{ container.docker.repoName }} || true
+
+  if [[ $? -ne 0 ]]; then
+  aws ecr --region {{ region }} create-repository --repository-name {{ container.docker.repoName }}
+  fi
+{% endif %}
+{% endfor %}

@@ -1,0 +1,137 @@
+global001: value001
+templates:
+  templateGroup001:
+    template001.j2:
+      default:
+        var002: val002
+allContainers:
+  - name: '-container001'
+    container: container002
+    var1: val1
+    template: {}
+  - name: '-container002'
+    templates:
+      templateGroup001:
+        template001.j2:
+          default:
+            var001: val001
+          environment001:
+            var001: val003
+    template:
+      var001: val001
+allContainersByName:
+  container001:
+    name: '-container001'
+    container: container002
+    var1: val1
+    template: {}
+  container002:
+    name: '-container002'
+    templates:
+      templateGroup001:
+        template001.j2:
+          default:
+            var001: val001
+          environment001:
+            var001: val003
+    template:
+      var001: val001
+allApplications:
+  - name: application010
+    containers:
+      - container: container002
+        var1: val1
+    environments:
+      - environment: environment002
+        var2: val2
+    hasContainer:
+      container002: true
+    hasEnvironment:
+      environment002: true
+    template: {}
+allApplicationsByName:
+  application010:
+    name: application010
+    containers:
+      - container: container002
+        var1: val1
+    environments:
+      - environment: environment002
+        var2: val2
+    hasContainer:
+      container002: true
+    hasEnvironment:
+      environment002: true
+    template: {}
+allEnvironments:
+  - varOverridden: valOverridden
+    varRegular: valRegular
+    varInherited: valInherited
+    template: {}
+  - varOverridden: valOverridden2
+    varRegular: valRegular
+    varInherited: valInherited
+    inherits: environment001
+    varRegular2: valRegular2
+    template: {}
+allEnvironmentsByName:
+  environment001:
+    varOverridden: valOverridden
+    varRegular: valRegular
+    varInherited: valInherited
+    template: {}
+  environment002:
+    varOverridden: valOverridden2
+    varRegular: valRegular
+    varInherited: valInherited
+    inherits: environment001
+    varRegular2: valRegular2
+    template: {}
+containers:
+  - name: '-container001'
+    container: container002
+    var1: val1
+    template: {}
+  - name: '-container002'
+    templates:
+      templateGroup001:
+        template001.j2:
+          default:
+            var001: val001
+          environment001:
+            var001: val003
+    template:
+      var001: val001
+containersByName:
+  container001:
+    name: '-container001'
+    container: container002
+    var1: val1
+    template: {}
+  container002:
+    name: '-container002'
+    templates:
+      templateGroup001:
+        template001.j2:
+          default:
+            var001: val001
+          environment001:
+            var001: val003
+    template:
+      var001: val001
+name: application010
+environments:
+  - environment: environment002
+    var2: val2
+hasContainer:
+  container002: true
+hasEnvironment:
+  environment002: true
+varOverridden: valOverridden2
+varRegular: valRegular
+varInherited: valInherited
+template:
+  default:
+    var002: val002
+inherits: environment001
+varRegular2: valRegular2
