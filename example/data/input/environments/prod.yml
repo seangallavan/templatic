@@ -1,4 +1,0 @@
----
-env: prod
-region: us-west-2
-ecrAddress: 012345677.dkr.ecr.us-west-2.amazonaws.com

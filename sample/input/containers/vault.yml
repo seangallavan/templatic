@@ -1,0 +1,56 @@
+---
+name: vault
+port: 8100
+docker:
+  dockerfileName: Dockerfile-vault
+  command: ["vault"]
+  args: ["agent", "-config=/home/vault/vault-agent.hcl",  "-log-level=debug"]
+
+templates:
+  kubernetes:
+    deployment.yml.j2:
+      env:
+        - name: SKIP_SETCAP
+          value: "true"
+        - name: VAULT_ADDR
+          value: "{{ environment.vaultAddress }}"
+        - name: VAULT_CACERT
+          value: /home/vault/august-runtime-creds/vault.crt
+      volumes:
+        - name: vault-token
+          emptyDir:
+            medium: Memory
+        - name: vault-config
+          configMap:
+            name: vault-agent-config-map
+            items:
+              - key: vault-agent.hcl
+                path: vault-agent.hcl
+      volumeMounts:
+        - name: august-runtime-creds-volume
+          mountPath: /home/vault/august-runtime-creds
+        - name: vault-token
+          mountPath: /vault/etc
+        - name: vault-config
+          mountPath: /home/vault
+      requests:
+        cpu: 10m
+        memory: 20Mi
+      limits:
+        memory: 150Mi
+      readinessProbe:
+        tcpSocket:
+          port: 8100
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        timeoutSeconds: 1
+        successThreshold: 1
+        failureThreshold: 3
+      livenessProbe:
+        tcpSocket:
+          port: 8100
+        initialDelaySeconds: 10
+        periodSeconds: 3
+        timeoutSeconds: 1
+        successThreshold: 1
+        failureThreshold: 3

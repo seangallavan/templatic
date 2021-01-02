@@ -1,0 +1,4 @@
+name: test
+inherits: us-east-1
+
+vaultAddress: https://vault-test

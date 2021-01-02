@@ -5,7 +5,7 @@ const fs = require('fs-extra');
 
 const data = require('./lib/data');
 
-const outputDir = './output';
+const outputDir = './output_old';
 
 module.exports = (async function () {
   if(!argv.a) {

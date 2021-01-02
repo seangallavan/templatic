@@ -1,0 +1,8 @@
+FROM vault:latest
+ENV VAULT_CACERT /home/vault/august-runtime-creds/vault.crt
+
+RUN echo "${VAULT_ROLE_ID}" > /tmp/vault-role-id
+RUN echo "${VAULT_SECRET_ID}" > /tmp/vault-secret-id
+
+RUN apk update
+RUN apk add bash

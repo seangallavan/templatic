@@ -1,0 +1,36 @@
+---
+name: dind # Docker-in-docker
+port: 2376
+docker:
+  imageName: docker:19-dind
+
+templates:
+  kubernetes:
+    deployment.yml.j2:
+      env:
+        - name: DOCKER_TLS_CERTDIR
+          value: /certs
+      securityContext:
+        privileged: true
+      volumes:
+        - name: docker-graph-storage
+          emptyDir:
+            medium: Memory
+        - name: docker-certs
+          emptyDir:
+            medium: Memory
+        - name: deployer-tmpdir
+          emptyDir:
+            medium: Memory
+      volumeMounts:
+        - name: docker-graph-storage
+          mountPath: /var/lib/docker
+        - name: docker-certs
+          mountPath: /certs
+        - name: deployer-tmpdir
+          mountPath: /deployer
+      requests:
+        cpu: 20m
+        memory: 512Mi
+      limits:
+        memory: 768Mi

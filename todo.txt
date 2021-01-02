@@ -1,0 +1,6 @@
+- copy directories in input directory untouched *
+- script execution groups
+- run command
+- template groups in groups
+- marking executable
+- 

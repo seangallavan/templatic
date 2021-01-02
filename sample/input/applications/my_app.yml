@@ -1,0 +1,60 @@
+# Every application must have a name
+name: my_app
+
+# Optional inheritance from another application YAML file
+inherits: my_base_app
+
+# Optional container specification
+containers:
+  - name: nodejs
+    port: 8080
+  - name: vault
+
+# Optional limits to which environments it will be deployed in
+environments:
+  - name: dev
+    var1: val1
+  - name: test
+
+# Variables for specific templates
+templates:
+  kubernetes: # Template group
+    deployment.yml.j2: # Template name
+      var: val
+
+      environments:
+        - name: default
+          var: val
+
+          containers:
+            - name: nodejs
+              requests:
+                cpu: 20m
+                memory: 100Mi
+              limits:
+                memory: 200Mi
+            - name: vault
+              requests:
+                cpu: 5m
+                memory: 10Mi
+              limits:
+                memory: 20Mi
+        - name: prod # Production environment
+          containers:
+            - name: nodejs
+              requests:
+                cpu: 50m
+                memory: 200Mi
+              limits:
+                memory: 300Mi
+
+    service.yml.j2:
+      loadBalancer: public
+
+    hpa.yml.j2:
+      environments:
+        default:
+          minReplicas: 2
+          maxReplicas: 3
+        prod-aww:
+          maxReplicas: 10

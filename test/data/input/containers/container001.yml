@@ -1,0 +1,10 @@
+---
+name: container001
+containerVar1: containerVal1
+
+cvar1: cval2
+
+templates:
+  templateGroup001:
+    template001.txt:
+      cVar3: cVal3

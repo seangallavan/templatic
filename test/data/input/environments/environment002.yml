@@ -1,4 +1,4 @@
-inherits: environment001
+---
+name: environment002
 
-varOverridden: valOverridden2
-varRegular2: valRegular2
+environmentVar1: environmentVal2

@@ -1,0 +1,51 @@
+---
+port: 10000
+serverFile: server.js
+
+docker:
+  dockerfileName: Dockerfile-nodejs
+
+env:
+  - name: NODE_ENV
+    value: {{ environment }}
+  - name: CLUSTER_MODE_DISABLED
+    value: "1"
+
+templates:
+  kubernetes:
+    deployment.yml.j2:
+      env:
+        - name: NODE_ENV
+          value: "{{ environment.name }}"
+        - name: CLUSTER_MODE_DISABLED
+          value: "1"
+      volumeMounts:
+        - name: node
+          mountPath: /logs
+        - name: august-runtime-creds-volume
+          mountPath: /root/august-runtime-creds
+      requests:
+        cpu: 25m
+        memory: 100Mi
+      limits:
+        memory: 200Mi
+      readinessProbe:
+        httpGet:
+          path:  /health
+          scheme: HTTP
+          port: "{{ container.port }}"
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        timeoutSeconds: 1
+        successThreshold: 1
+        failureThreshold: 3
+      livenessProbe:
+        httpGet:
+          path:  /health
+          scheme: HTTP
+          port: "{{ container.port }}"
+        initialDelaySeconds: 10
+        periodSeconds: 3
+        timeoutSeconds: 1
+        successThreshold: 1
+        failureThreshold: 3

@@ -1,0 +1,4 @@
+name: prod_base
+inherits: us-west-2
+
+vaultAddress: vault-prod

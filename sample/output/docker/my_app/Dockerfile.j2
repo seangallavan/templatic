@@ -1,0 +1,23 @@
+FROM node:8
+
+# Configure ssh
+RUN  echo "    IdentityFile ~/.ssh/id_rsa" >> /etc/ssh/ssh_config
+RUN mkdir -p /root/.ssh
+RUN mkdir -p /logs/app
+COPY id_rsa_august_bitbucket /root/.ssh/id_rsa
+RUN chmod 600 /root/.ssh/id_rsa
+RUN echo "Host bitbucket.org" >> /root/.ssh/config
+RUN echo "    StrictHostKeyChecking no" >> /root/.ssh/config
+
+# Create app directory
+RUN mkdir -p /usr/src/august-smart-things/
+
+# Install smart-things app
+ADD august-smart-things/ /usr/src/august-smart-things/
+WORKDIR /usr/src/august-smart-things/
+
+# Install node modules
+RUN npm install --production
+RUN rm /root/.ssh/id_rsa
+
+ENTRYPOINT [ "node", "server.js" ]

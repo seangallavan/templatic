@@ -1,0 +1,190 @@
+allEnvironments:
+  - name: environment001
+    environmentVar1: environmentVal1
+    templates: {}
+  - name: environment002
+    environmentVar1: environmentVal2
+    templates: {}
+allEnvironmentsByName:
+  environment001:
+    name: environment001
+    environmentVar1: environmentVal1
+    templates: {}
+  environment002:
+    name: environment002
+    environmentVar1: environmentVal2
+    templates: {}
+allContainers:
+  - name: container001
+    containerVar1: containerVal1
+    cvar1: cval2
+    templates:
+      templateGroup001:
+        template001.txt:
+          cVar3: cVal3
+  - name: container002
+    containerVar1: containerVal2
+    templates: {}
+allContainersByName:
+  container001:
+    name: container001
+    containerVar1: containerVal1
+    cvar1: cval2
+    templates:
+      templateGroup001:
+        template001.txt:
+          cVar3: cVal3
+  container002:
+    name: container002
+    containerVar1: containerVal2
+    templates: {}
+allApplications:
+  - name: application001
+    appVar1: appVal1
+    containers:
+      - name: container001
+        containerVar1: containerVal1
+        cvar1: cval1
+        templates:
+          templateGroup001:
+            template001.txt:
+              cVar3: cVal2
+    environments:
+      - name: environment001
+        environmentVar1: environmentVal2
+        templates: {}
+        evar1: eval1
+    templates:
+      templateGroup001:
+        template001.txt:
+          appVar1: overriddenValue
+    containersByName:
+      container001:
+        name: container001
+        cvar1: cval1
+        templates:
+          templateGroup001:
+            template001.txt:
+              cVar3: cVal2
+    environmentsByName:
+      environment001:
+        name: environment001
+        evar1: eval1
+        environmentVar1: environmentVal2
+  - name: application002
+    appVar1: appVal2
+    templates: {}
+    containers:
+      - name: container001
+        containerVar1: containerVal1
+        cvar1: cval2
+        templates:
+          templateGroup001:
+            template001.txt:
+              cVar3: cVal3
+      - name: container002
+        containerVar1: containerVal2
+        templates: {}
+    containersByName:
+      container001:
+        name: container001
+        containerVar1: containerVal1
+        cvar1: cval2
+        templates:
+          templateGroup001:
+            template001.txt:
+              cVar3: cVal3
+      container002:
+        name: container002
+        containerVar1: containerVal2
+    environments:
+      - name: environment001
+        environmentVar1: environmentVal1
+        templates: {}
+      - name: environment002
+        environmentVar1: environmentVal2
+        templates: {}
+    environmentsByName:
+      environment001:
+        name: environment001
+        environmentVar1: environmentVal1
+      environment002:
+        name: environment002
+        environmentVar1: environmentVal2
+allApplicationsByName:
+  application001:
+    name: application001
+    appVar1: appVal1
+    containers:
+      - name: container001
+        containerVar1: containerVal1
+        cvar1: cval1
+        templates:
+          templateGroup001:
+            template001.txt:
+              cVar3: cVal2
+    environments:
+      - name: environment001
+        environmentVar1: environmentVal2
+        templates: {}
+        evar1: eval1
+    templates:
+      templateGroup001:
+        template001.txt:
+          appVar1: overriddenValue
+    containersByName:
+      container001:
+        name: container001
+        cvar1: cval1
+        templates:
+          templateGroup001:
+            template001.txt:
+              cVar3: cVal2
+    environmentsByName:
+      environment001:
+        name: environment001
+        evar1: eval1
+        environmentVar1: environmentVal2
+  application002:
+    name: application002
+    appVar1: appVal2
+    templates: {}
+    containers:
+      - name: container001
+        containerVar1: containerVal1
+        cvar1: cval2
+        templates:
+          templateGroup001:
+            template001.txt:
+              cVar3: cVal3
+      - name: container002
+        containerVar1: containerVal2
+        templates: {}
+    containersByName:
+      container001:
+        name: container001
+        containerVar1: containerVal1
+        cvar1: cval2
+        templates:
+          templateGroup001:
+            template001.txt:
+              cVar3: cVal3
+      container002:
+        name: container002
+        containerVar1: containerVal2
+    environments:
+      - name: environment001
+        environmentVar1: environmentVal1
+        templates: {}
+      - name: environment002
+        environmentVar1: environmentVal2
+        templates: {}
+    environmentsByName:
+      environment001:
+        name: environment001
+        environmentVar1: environmentVal1
+      environment002:
+        name: environment002
+        environmentVar1: environmentVal2
+globals:
+  globalVar1: globalVal1

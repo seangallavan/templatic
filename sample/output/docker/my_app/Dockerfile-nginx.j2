@@ -1,0 +1,5 @@
+FROM nginx
+
+RUN mkdir /logs
+COPY nginx.conf /etc/nginx/conf.d/{{ shortName }}.conf
+COPY nginx-root.conf /etc/nginx/nginx.conf

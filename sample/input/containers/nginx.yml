@@ -1,0 +1,43 @@
+---
+name: nginx
+port: 443
+
+docker:
+  repoNameEnding: -nginx
+  dockerfileName: Dockerfile-nginx
+
+templates:
+  kubernetes:
+    deployment.yml.j2:
+      volumeMounts:
+        - name: node
+          mountPath: /logs
+        - name: august-runtime-creds-volume
+          mountPath: /root/august-runtime-creds
+      hostAliases:
+        - ip: "127.0.0.1"
+      requests:
+        cpu: 25m
+        memory: 100Mi
+      limits:
+        memory: 200Mi
+      readinessProbe:
+        httpGet:
+          path:  /ping
+          scheme: HTTPS
+          port: 443
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        timeoutSeconds: 1
+        successThreshold: 1
+        failureThreshold: 3
+      livenessProbe:
+        httpGet:
+          path:  /ping
+          scheme: HTTPS
+          port: 443
+        initialDelaySeconds: 10
+        periodSeconds: 3
+        timeoutSeconds: 1
+        successThreshold: 1
+        failureThreshold: 3

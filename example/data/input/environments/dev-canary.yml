@@ -1,5 +1,0 @@
----
-inherits: dev
-
-#overrides
-env: dev-canary

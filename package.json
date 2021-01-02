@@ -4,7 +4,7 @@
   "description": "##Usage ###Download templatic We recommend you clone the repository so that it can be updated with git:",
   "main": "index.js",
   "bin": {
-    "templatic": "cli"
+    "templatic": "./cli.sh"
   },
   "pkg": {
     "scripts": [
@@ -15,21 +15,29 @@
   "dependencies": {
     "fs-extra": "^8.1.0",
     "js-yaml": "^3.13.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.20",
     "nconf": "^0.10.0",
     "nunjucks": "^3.2.1",
     "yargs": "^15.3.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^7.1.0",
+    "eslint": "^7.17.0",
+    "eslint-config-prettier": "^7.1.0",
+    "eslint-plugin-security": "^1.4.0",
+    "husky": "^4.3.6",
+    "lint-staged": "^10.5.3",
     "mocha": "^6.2.3",
+    "nyc": "^15.1.0",
+    "prettier": "^2.2.1",
     "sinon": "^9.0.2"
   },
   "scripts": {
     "test": "scripts/test.sh",
-    "build": "pkg -t node8-linux-x64,node8-macos-x64 -o ./build/akdcli ."
+    "build": "pkg -t node8-linux-x64,node8-macos-x64 -o ./build/akdcli .",
+    "lint": "eslint --color ./"
   },
+  "precommit": "lint-staged",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/seangallavan/templatic.git"

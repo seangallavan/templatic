@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ application.name }}-{{ environment.name }}
+  labels:
+    app: {{ application.name }}-{{ environment.name }}
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ application.name }}-{{ environment.name }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  progressDeadlineSeconds: 120
+
+  template:
+    metadata:
+      labels:
+        app: {{ application.name }}-{{ environment.name }}
+    spec:
+      hostAliases:
+      {%- for container in containers %}
+      {%- if container.template.hostAliases is defined %}
+      {%- for hostAlias in container.template.hostAliases %}
+        - ip: {{ hostAlias.ip }}
+          hostnames:
+            - {{ application.name }}
+      {%- endfor %}
+      {%- endif %}
+      {%- endfor %}
+
+      volumes:
+        - name: runtime-creds-volume
+          persistentVolumeClaim:
+            claimName: runtime-creds-pvc
+        - name: node
+          hostPath:
+            path: /logs
+        {%- for container in containers %}
+        {%- if container.template.volumes is defined %}
+        {%- for volume in container.template.volumes %}
+        - {{ volume | dump | safe }}
+        {%- endfor %}
+        {%- endif %}
+        {%- endfor %}
+
+      dnsPolicy: ClusterFirst
+
+      containers:
+          {%- for container in containers %}
+        - name: {{ container.name }}-{{ environment.name }}
+          image: {% if container.docker.imageName is defined %} {{ container.docker.imageName }} {% else %}{{ ecrAddress }}/{{ application.name }}-{{ environment.name }}:latest{% endif %}
+          imagePullPolicy: Always
+
+          {% if container.port is defined -%}
+          ports:
+            - containerPort: {{ container.port }}
+          {%- endif %}
+
+          {% if container.env is defined -%}
+          env: {{ container.env | dump | safe }}
+            {% if application.hasContainer.dind %}
+            - name: DOCKER_HOST
+              value: tcp://localhost:2376
+            - name: DOCKER_TLS_CERTDIRe
+              value:/certs
+            - name: DOCKER_TLS_VERIFY
+              value: "1"
+            - name: DOCKER_CERT_PATH
+              value: /certs/client
+            {% endif %}
+            {% if application.hasContainer.vault -%}
+            - name: VAULT_ADDR
+              value: http://127.0.0.1:8100
+            {%- endif %}
+            {%- endif %}
+
+          resources:
+            {% if container.template.requests is defined -%}
+            requests: {{ container.template.requests | dump | safe }}
+            {%- endif %}
+            {% if container.template.limits is defined -%}
+            limits: {{ container.template.limits | dump | safe }}
+            {%- endif %}
+
+          {%- if container.docker.command is defined %}
+          command: container.docker.command
+          {%- endif %}
+          {%- if container.docker.args is defined %}
+          args: container.docker.args
+          {%- endif %}
+
+          volumeMounts:
+            - name: node
+              mountPath: /logs
+            {% if container.template.volumeMounts is defined -%}
+            {% for mount in container.template.volumeMounts -%}
+            - name: mount.name
+              mountPath: mount.mountPath
+            {% endfor %}
+            {% endif %}
+            {% if application.hasContainer.vault -%}
+            - name: vault-token
+              mountPath: /vault/etc
+            - name: vault-config
+              mountPath: /home/vault
+            {%- endif %}
+            {% if application.hasContainer.dind -%}
+            - name: docker-certs
+              mountPath: /certs
+            - name: deployer-tmpdir
+              mountPath: /deployer
+            {%- endif %}
+
+          {%- if container.securityContext is defined %}
+          securityContext: {{ container.securityContext | dump | safe }}
+          {%- endif -%}
+
+          {%- if container.template.readinessProbe is defined %}
+          readinessProbe: {{ container.template.readinessProbe | dump | safe }}
+          {%- endif %}
+          {%- if container.template.livenessProbe is defined %}
+          livenessProbe: {{ container.template.livenessProbe | dump | safe }}
+          {%- endif %}
+
+        {%- endfor -%}

@@ -1,13 +1,3 @@
+---
 name: application002
-
-containers:
-  - type: container001
-
-templates:
-  templateGroup001:
-    template001.j2:
-      default:
-        var001: val001
-      environments:
-        environment001:
-          var001: val003
+appVar1: appVal2

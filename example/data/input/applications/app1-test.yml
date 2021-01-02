@@ -1,6 +1,0 @@
-name: app1-test
-
-containers:
-  - type: nodejs
-    port: 3030
-  - type: nginx

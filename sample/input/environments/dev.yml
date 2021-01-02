@@ -1,0 +1,4 @@
+name: dev
+inherits: us-east-1
+
+vaultAddress: vault-dev

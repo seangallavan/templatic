@@ -1,0 +1,5 @@
+name: us-west-2
+base: true
+
+region: us-west-2
+ecrAddress: 1234.dkr.ecr.us-west-2.amazonaws.com

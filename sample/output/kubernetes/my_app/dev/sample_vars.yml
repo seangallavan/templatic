@@ -1,0 +1,161 @@
+allApplications:
+  - name: application001
+    containers:
+      - type: nodejs
+        port: 8080
+      - type: vault
+    environments:
+      - type: dev
+        var1: val1
+      - type: test
+    templates:
+      kubernetes: # Template group
+        deployment.yml.j2: # Template name
+          var: val
+          environments:
+            default:
+            dev:
+
+          default: # Default environment
+            containers:
+              nodejs:
+                requests:
+                  cpu: 20m
+                  memory: 100Mi
+                limits:
+                  memory: 200Mi
+              vault:
+                requests:
+                  cpu: 5m
+                  memory: 10Mi
+                limits:
+                  memory: 20Mi
+          prod: # Production environment
+            containers:
+              nodejs:
+                requests:
+                  cpu: 50m
+                  memory: 200Mi
+                limits:
+                  memory: 300Mi
+
+        service.yml.j2:
+          default:
+            loadBalancer: public
+
+        hpa.yml.j2:
+          default:
+            minReplicas: 2
+            maxReplicas: 3
+          prod-aww:
+            maxReplicas: 10
+allEnvironments:
+  - name: dev
+    region: us-east-1
+  - name: test
+    region: us-west-2
+allContainers:
+  - name: nodejs
+    port: 10000
+    serverFile: server.js
+
+    docker:
+      repoName: { { shortName } }
+      dockerfileName: Dockerfile-nodejs
+
+    env:
+      - name: NODE_ENV
+        value: { { environment } }
+      - name: CLUSTER_MODE_DISABLED
+        value: "1"
+
+      { %- if hasContainer.dind % }
+      - name: DOCKER_HOST
+        value: tcp://localhost:2376
+      - name: DOCKER_TLS_CERTDIRe
+        value:/certs
+      - name: DOCKER_TLS_VERIFY
+        value: "1"
+      - name: DOCKER_CERT_PATH
+        value: /certs/client
+      { %- endif % }
+
+    templates:
+      kubernetes:
+        deployment.yml.j2:
+          default:
+            env:
+              - name: NODE_ENV
+                value: { { environment } }
+              - name: CLUSTER_MODE_DISABLED
+                value: "1"
+              { % if hasContainer.vault -% }
+              - name: VAULT_ADDR
+                value: http://127.0.0.1:8100
+              { %- endif % }
+            volumeMounts:
+              - name: node
+                mountPath: /logs
+              - name: august-runtime-creds-volume
+                mountPath: /root/august-runtime-creds
+              { % if hasContainer.vault -% }
+              - name: vault-token
+                mountPath: /vault/etc
+              - name: vault-config
+                mountPath: /home/vault
+              { %- endif % }
+              { % if hasContainer.dind -% }
+              - name: docker-certs
+                mountPath: /certs
+              - name: deployer-tmpdir
+                mountPath: /deployer
+              { %- endif % }
+            requests:
+              cpu: 25m
+              memory: 100Mi
+            limits:
+              memory: 200Mi
+            readinessProbe:
+              httpGet:
+                path: /health
+                scheme: HTTP
+                port: { { container.port } }
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+            livenessProbe:
+              httpGet:
+                path: /health
+                scheme: HTTP
+                port: { { container.port } }
+              initialDelaySeconds: 10
+              periodSeconds: 3
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+allApplicationsByName:
+allEnvironmentsByName:
+allContainersByName:
+
+renderVars:
+  application:
+    name: application001
+    var: val
+    template:
+  environment:
+    name: dev
+    region: us-east-1
+    template:
+  containers:
+    - name: nodejs
+      port: 10000
+      template:
+  template:
+    var: val
+    environment:
+      var2: val2
+    containers:
+      - name: nodejs
+        var3: val3

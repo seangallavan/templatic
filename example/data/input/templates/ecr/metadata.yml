@@ -1,8 +1,0 @@
----
-outputDirectoryHierarchy:
-  - application
-  - environment
-
-templates:
-  createECR.sh.j2:
-    executable: true

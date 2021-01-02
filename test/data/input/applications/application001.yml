@@ -1,1 +1,21 @@
+---
 name: application001
+appVar1: appVal1
+
+containers:
+  - name: container001
+    cvar1: cval1
+    templates:
+      templateGroup001:
+        template001.txt:
+          cVar3: cVal2
+
+environments:
+  - name: environment001
+    evar1: eval1
+    environmentVar1: environmentVal2
+
+templates:
+  templateGroup001:
+    template001.txt:
+      appVar1: overriddenValue

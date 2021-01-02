@@ -1,0 +1,4 @@
+name: stage
+inherits: us-west-2
+
+vaultAddress: vault-stage

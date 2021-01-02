@@ -1,0 +1,5 @@
+name: us-east-1
+base: true
+
+region: us-east-1
+ecrAddress: 1234.dkr.ecr.us-east-1.amazonaws.com

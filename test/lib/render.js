@@ -1,106 +1,64 @@
 'use strict';
 
-const _ = require('lodash');
-const should = require('chai').should();
+require('chai').should();
 const sinon = require('sinon');
-const fs = require('fs');
 
 const variables = require('../../lib/variables');
 const render = require('../../lib/render');
 const data = require('../../lib/data');
-const enrich = require('../../lib/enrich');
 
 describe('lib/render.js', () => {
-  describe('renderTemplateInstance', () => {
-    describe('basic', () => {
-      let rendered;
+  let vars;
 
-      before('getVars', () => {
-        const vars = variables.getVariables(['application001']);
-        const templateVars = _.merge({}, vars, vars.allApplicationsByName['application001']);
-
-        rendered = render.testing.renderTemplateInstance('templateGroup001', 'template001.j2', templateVars);
-      });
-
-      it('should render correctly', () => {
-        rendered.should.equal('application001');
-      });
-    });
+  before('setDataPath', () => {
+    data.setDataPath(__dirname + '/../data');
   });
 
-  describe('renderTemplateRecursive', () => {
-    describe('calling enrich.enrichRenderVars', () => {
-      let vars;
-      let spy;
-      let args;
+  before('global vars', () => {
+    vars = variables.getGlobalVars();
+  });
 
-      const scope = {
-        applications: ['application010'],
-        environments: data.getEnvironmentNames(),
-        templateGroups: data.getTemplateGroupNames(),
-        containers: data.getContainerNames(),
-        templates: null,
-      };
+  describe('renderTemplateInstance', () => {
+    let rendered;
+    let renderVars;
 
-      before('setup spy', () => {
-        spy = sinon.spy(enrich, 'enrichRenderVars');
-      });
+    const scope = {
+      applications: ['application001', 'application002'],
+      environments: ['environment001', 'environment002'],
+      templateGroups: ['templateGroup001'],
+      containers: ['container001', 'container002'],
+      templateNames: ['template001.txt'],
+    };
+    const constraints = {
+      application: 'application001',
+      environment: 'environment001',
+    }
 
-      after('restore spy', () => {
-        spy.restore();
-      });
+    before('getTemplateVariables', () => {
+      renderVars = variables.getTemplateVariables('templateGroup001',
+        'template001.txt', constraints, scope, vars);
+    });
 
-      before('getVars', () => {
-        vars = variables.getVariables(['application010']);
-      });
+    before('renderTemplateInstance', () => {
+      rendered = render.testing.renderTemplateInstance('templateGroup001',
+        'template001.txt', renderVars);
+    });
 
-      before('call renderTemplate', () => {
-        render.renderTemplate('templateGroup001', 'template001.j2', data.getOutputDirectoryHierarchy('templateGroup001'),
-          `${data.getDataPath()}/output`, vars, scope);
-
-        args = spy.firstCall.args;
-      });
-
-      it('should call the spy once', () => {
-        spy.callCount.should.equal(data.getOutputDirectoryHierarchy('templateGroup001').length);
-      });
-
-      it('should be called with the correct first argument', () => {
-        args[0].should.deep.equal(vars);
-      });
-
-      it('should be called with the correct second argument', () => {
-        args[1].should.equal('templateGroup001');
-      });
-
-      it('should be called with the correct third argument', () => {
-        args[2].should.equal('template001.j2');
-      });
-
-      it('should be called with the correct fourth argument', () => {
-        args[3].length.should.equal(data.getOutputDirectoryHierarchy('templateGroup001').length);
-        args[3][0].should.equal('application');
-        args[3][1].should.equal('environment');
-      });
-
-      it('should be called with the correct fifth argument', () => {
-        args[4].should.deep.equal(scope);
-      });
+    it('should render correctly', () => {
+      rendered.should.equal('application001');
     });
   });
 
   describe('renderTemplate', () => {
-    let vars;
-    let rendered;
-    const scope = {
-      applications: ['application010'],
-      environments: data.getEnvironmentNames(),
-      templateGroups: data.getTemplateGroupNames(),
-      containers: data.getContainerNames(),
-      templateNames: null,
-    };
-
+    let args;
     let spy;
+    const scope = {
+      applications: ['application001', 'application002'],
+      environments: ['environment001', 'environment002'],
+      templateGroups: ['templateGroup001'],
+      containers: ['container001', 'container002'],
+      templateNames: ['template001.txt'],
+    };
 
     before('setup spy', () => {
       spy = sinon.spy(render.testing, 'renderTemplateRecursive');
@@ -110,27 +68,41 @@ describe('lib/render.js', () => {
       spy.restore();
     });
 
-    before('get vars', () => {
-      vars = variables.getVariables(['application010']);
+    before('call renderTemplate', () => {
+      render.renderTemplate('templateGroup001', 'template001.txt', scope, vars);
+
+      args = spy.firstCall.args;
     });
 
-    before('render it', () => {
-      render.renderTemplate('templateGroup002', 'template002.j2', data.getOutputDirectoryHierarchy('templateGroup002'), `${data.getDataPath()}/output`, vars, scope);
+    it('should be called with the correct template group', () => {
+      args[0].should.equal('templateGroup001');
     });
 
-    before('get rendered file', () => {
-      rendered = fs.readFileSync(`${data.getDataPath()}/output/templateGroup002/application010/template002`, {encoding: 'utf8'});
+    it('should be called with the correct template name', () => {
+      args[1].should.equal('template001.txt');
     });
 
-    it('should add global vars', () => {
-      const args = spy.firstCall.args;
-      args[5].temporaryVars.should.exist;
-      args[5].renderVars.should.exist;
-      args[5].renderVars.global001.should.equal('value001');
+    it('should be called with the correct directory hierarchy', () => {
+      args[2].length.should.equal(data.getOutputDirectoryHierarchy('templateGroup001').length);
+      args[2][0].should.equal('application');
+      args[2][1].should.equal('environment');
     });
 
-    it('should render correctly', () => {
-      rendered.should.equal('application010');
+    it('should be called with the correct directory level', () => {
+      args[3].should.equal(0);
     });
-  })
+
+    it('should be called with the directory tp save to', () => {
+      args[4].should.deep.equal(`${data.getDataPath()}/output/templateGroup001`);
+    });
+
+    it('should be called with the correct render vars', () => {
+      args[5].should.deep.equal({});
+    });
+
+    it('should be called with the correct scope', () => {
+      args[6].should.deep.equal(scope);
+    });
+
+  });
 });
