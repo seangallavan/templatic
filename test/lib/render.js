@@ -61,7 +61,7 @@ describe('lib/render.js', () => {
     };
 
     before('setup spy', () => {
-      spy = sinon.spy(render.testing, 'renderTemplateRecursive');
+      spy = sinon.spy(render.testing, 'renderTemplateOrFileRecursive');
     });
 
     after('restore spy', () => {
@@ -69,7 +69,7 @@ describe('lib/render.js', () => {
     });
 
     before('call renderTemplate', () => {
-      render.renderTemplate('templateGroup001', 'template001.txt.j2', scope, vars);
+      render.renderTemplateOrFile('templateGroup001', 'template001.txt.j2', scope, vars);
 
       args = spy.firstCall.args;
     });

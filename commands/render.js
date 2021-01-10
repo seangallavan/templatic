@@ -45,7 +45,7 @@ exports.handler = argv => {
     scope.validateScope(argv, outputDirectoryHierarchy);
 
     templateNames.forEach(templateName => {
-      render.renderTemplate(templateGroup, templateName, thisScope, vars);
+      render.renderTemplateOrFile(templateGroup, templateName, thisScope, vars);
     });
   });
 };

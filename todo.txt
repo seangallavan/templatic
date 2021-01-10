@@ -13,3 +13,4 @@
 - script to deploy should have option to overwrite or not
 - symbolic links to real files after rendering
 - copy mode of template file including executability
+- when creating template, create metadata.yml

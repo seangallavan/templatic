@@ -16,7 +16,7 @@ describe('lib/scope', () => {
     const intended = {
       applications: ['application001', 'application002'],
       environments: ['environment001', 'environment002'],
-      templateGroups: ['templateGroup001', 'templateGroup002'],
+      templateGroups: ['templateGroup001', 'templateGroup002', 'templateGroup003'],
       containers: ['container001', 'container002'],
       templateNames: undefined,
     }
