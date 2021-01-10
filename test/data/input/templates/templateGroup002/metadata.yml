@@ -1,0 +1,4 @@
+---
+outputDirectoryHierarchy:
+  - environment #top level
+  - application #second level

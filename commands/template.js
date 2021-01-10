@@ -21,6 +21,6 @@ exports.builder = {
 exports.handler = argv => {
   data.setDataPath(argv.dataDir ? argv.dataDir : process.cwd());
 
-  fs.ensureFileSync(`${data.getDataPath()}/input/templates/${argv.templateGroup}/${argv.templateName}.j2`);
+  fs.ensureFileSync(`${data.getDataPath()}/input/templates/${argv.templateGroup}/${argv.templateName}`);
   fs.ensureFileSync(`${data.getDataPath()}/input/templates/${argv.templateGroup}/metadata.yml`);
 };

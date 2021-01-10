@@ -1,6 +1,6 @@
 - copy directories in input directory untouched *
 - script execution groups
-- marking executable
+- document and test marking executable
 - executing scripts
 - recursive templates
 - don't create a file
@@ -11,4 +11,5 @@
 - render template if something is true
 - create directories for each environment and populate them
 - script to deploy should have option to overwrite or not
-
+- symbolic links to real files after rendering
+- copy mode of template file including executability

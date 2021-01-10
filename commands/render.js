@@ -33,19 +33,19 @@ exports.builder = {
 exports.handler = argv => {
   data.setDataPath(argv.dataDir ? argv.dataDir : process.cwd());
 
-  const scope = scope.getScope(argv);
+  const thisScope = scope.getScope(argv);
 
   const vars = variables.getGlobalVars();
   data.saveGlobalVars(vars);
 
-  scope.templateGroups.forEach(templateGroup => {
+  thisScope.templateGroups.forEach(templateGroup => {
     const outputDirectoryHierarchy = data.getOutputDirectoryHierarchy(templateGroup);
-    const templateNames = scope.templateNames ? scope.templateNames.split(',') : data.getTemplateNamesInGroup(templateGroup);
+    const templateNames = thisScope.templateNames || data.getTemplateNamesInGroup(templateGroup);
 
     scope.validateScope(argv, outputDirectoryHierarchy);
 
     templateNames.forEach(templateName => {
-      render.renderTemplate(templateGroup, templateName, scope, vars);
+      render.renderTemplate(templateGroup, templateName, thisScope, vars);
     });
   });
 };

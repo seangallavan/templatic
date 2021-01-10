@@ -41,7 +41,7 @@ describe('lib/render.js', () => {
 
     before('renderTemplateInstance', () => {
       rendered = render.testing.renderTemplateInstance('templateGroup001',
-        'template001.txt', renderVars);
+        'template001.txt.j2', renderVars);
     });
 
     it('should render correctly', () => {
@@ -57,7 +57,7 @@ describe('lib/render.js', () => {
       environments: ['environment001', 'environment002'],
       templateGroups: ['templateGroup001'],
       containers: ['container001', 'container002'],
-      templateNames: ['template001.txt'],
+      templateNames: ['template001.txt.j2'],
     };
 
     before('setup spy', () => {
@@ -69,7 +69,7 @@ describe('lib/render.js', () => {
     });
 
     before('call renderTemplate', () => {
-      render.renderTemplate('templateGroup001', 'template001.txt', scope, vars);
+      render.renderTemplate('templateGroup001', 'template001.txt.j2', scope, vars);
 
       args = spy.firstCall.args;
     });
@@ -79,7 +79,7 @@ describe('lib/render.js', () => {
     });
 
     it('should be called with the correct template name', () => {
-      args[1].should.equal('template001.txt');
+      args[1].should.equal('template001.txt.j2');
     });
 
     it('should be called with the correct directory hierarchy', () => {
