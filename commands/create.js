@@ -1,5 +1,6 @@
 'use strict';
 const fs = require('fs-extra');
+const path = require('path');
 
 const data = require('../lib/data');
 
@@ -23,10 +24,23 @@ exports.builder = {
 
 exports.handler = argv => {
   data.setDataPath(argv.dataDir ? argv.dataDir : process.cwd());
-  
-  if(argv.resourceType === 'template') {
-    const paerts = ar
+  const resourceName = argv.resourceName;
+  const resourceType = argv.resourceType;
+
+  if(resourceType === 'template') {
+    const templateParts = resourceName.split('/');
+
+    fs.outputFileSync(`${data.getDataPath()}/input/${resourceType}s/${resourceName}`, '');
+    if(!fs.existsSync(`${data.getDataPath()}/input/${resourceType}s/${templateParts[0]}/metadata.yml`)) {
+      fs.outputFileSync(`${data.getDataPath()}/input/${resourceType}s/${templateParts[0]}/metadata.yml`, `---
+#outputDirectoryHierarchy:
+# Can consist of any order of: application, environment, container
+#  - application #top level
+#  - environment #second level
+`);
+    }
+  } else {
+    fs.outputFileSync(`${data.getDataPath()}/input/${resourceType}s/${resourceName}.yml`, `---\nname: ${resourceName}\n\n`);
   }
 
-  fs.outputFileSync(`${data.getDataPath()}/input/${argv.resourceType}s/${argv.resourceName}.yml`, `---\nname: ${argv.resourceName}\n\n`);
 };
