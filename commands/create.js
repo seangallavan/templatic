@@ -23,6 +23,10 @@ exports.builder = {
 
 exports.handler = argv => {
   data.setDataPath(argv.dataDir ? argv.dataDir : process.cwd());
+  
+  if(argv.resourceType === 'template') {
+    const paerts = ar
+  }
 
   fs.outputFileSync(`${data.getDataPath()}/input/${argv.resourceType}s/${argv.resourceName}.yml`, `---\nname: ${argv.resourceName}\n\n`);
 };

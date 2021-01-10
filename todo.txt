@@ -1,6 +1,14 @@
 - copy directories in input directory untouched *
 - script execution groups
-- run command
-- template groups in groups
 - marking executable
-- 
+- executing scripts
+- recursive templates
+- don't create a file
+- deployer
+- copy non-.j2 files as is
+- README.md created with new project
+- pre/post render scripts for templates or template groups
+- render template if something is true
+- create directories for each environment and populate them
+- script to deploy should have option to overwrite or not
+

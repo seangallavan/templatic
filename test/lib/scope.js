@@ -27,8 +27,8 @@ describe('lib/scope', () => {
 
     it('should contain everything', () => {
       result.should.eql(intended);
-    })
-  })
+    });
+  });
 
   describe('some options', () => {
     const argv = {
@@ -38,13 +38,14 @@ describe('lib/scope', () => {
       containers: 'container001,container002',
       templateNames: undefined,
     };
+
     const intended = {
       applications: ['application001', 'application002'],
       environments: ['environment001'],
       templateGroups: ['templateGroup001'],
       containers: ['container001', 'container002'],
       templateNames: undefined,
-    }
+    };
 
     before('get scope', () => {
       result = scope.getScope(argv);
