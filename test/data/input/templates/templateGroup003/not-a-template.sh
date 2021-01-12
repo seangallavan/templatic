@@ -1,3 +1,3 @@
 #!/bin/bash
 
-#do nothing
+echo "I'm not a template!"

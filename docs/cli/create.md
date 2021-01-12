@@ -5,12 +5,6 @@ This command creates resources. See detailed information about each
 resource type below.
 
 
-## Create Project Command
-`create project <projectName> <directory>`
-
-This is used to create the folder structure that is required for this project.
-The directory must exist and be empty.
-
 ## Create Application Command
 `create application <applicationName>`
 
@@ -30,7 +24,7 @@ This is used to create a YAML file in your environments folder for a type of
 environment (i.e., us-east-1). 
 
 ## Create Template Command
-`create template <templateName> <templateGroup>`
+`create template <templateGroup>/<templateName>`
 
 This is used to create a YAML file in your templates folder for a type of
 template (i.e., nodejs). If the template group does not exist, it will be created.

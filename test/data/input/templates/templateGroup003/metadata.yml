@@ -2,3 +2,8 @@
 outputDirectoryHierarchy:
   - application #top level
   - environment #second level
+
+scriptGroups:
+  all:
+    - not-a-template.sh
+    - template003.sh

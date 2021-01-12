@@ -12,17 +12,19 @@ describe('lib/scope', () => {
     data.setDataPath(__dirname + '/../data');
   });
 
-  describe('no options', () => {
+  describe('template specified', () => {
+    const argv = {
+      templatePaths: 'templateGroup001/template001.txt.j2',
+    };
     const intended = {
       applications: ['application001', 'application002'],
       environments: ['environment001', 'environment002'],
-      templateGroups: ['templateGroup001', 'templateGroup002', 'templateGroup003'],
       containers: ['container001', 'container002'],
-      templateNames: undefined,
+      templates: ['templateGroup001/template001.txt.j2'],
     }
 
     before('get scope', () => {
-      result = scope.getScope({})
+      result = scope.getScope(argv)
     });
 
     it('should contain everything', () => {
@@ -30,25 +32,19 @@ describe('lib/scope', () => {
     });
   });
 
-  describe('some options', () => {
+  describe('template group', () => {
     const argv = {
-      appNames: 'application001,application002',
-      envNames: 'environment001',
-      templateGroups: 'templateGroup001',
-      containers: 'container001,container002',
-      templateNames: undefined,
+      templatePaths: 'templateGroup001/*',
     };
-
     const intended = {
       applications: ['application001', 'application002'],
-      environments: ['environment001'],
-      templateGroups: ['templateGroup001'],
+      environments: ['environment001', 'environment002'],
       containers: ['container001', 'container002'],
-      templateNames: undefined,
-    };
+      templates: ['templateGroup001/template001.txt.j2'],
+    }
 
     before('get scope', () => {
-      result = scope.getScope(argv);
+      result = scope.getScope(argv)
     });
 
     it('should contain everything', () => {
@@ -56,20 +52,58 @@ describe('lib/scope', () => {
     });
   });
 
-  describe('template specified', () => {
+  describe('template group, template glob specified', () => {
     const argv = {
-      appNames: 'application001,application002',
-      envNames: 'environment001',
-      templateGroups: 'templateGroup001',
-      containers: 'container001,container002',
-      templateNames: 'template001.txt',
+      templatePaths: 'templateGroup001/*.txt.j2',
     };
     const intended = {
       applications: ['application001', 'application002'],
-      environments: ['environment001'],
-      templateGroups: ['templateGroup001'],
+      environments: ['environment001', 'environment002'],
       containers: ['container001', 'container002'],
-      templateNames: ['template001.txt'],
+      templates: ['templateGroup001/template001.txt.j2'],
+    }
+
+    before('get scope', () => {
+      result = scope.getScope(argv)
+    });
+
+    it('should contain everything', () => {
+      result.should.eql(intended);
+    });
+  });
+
+  describe('template and template group globs', () => {
+    const argv = {
+      templatePaths: 'templateGroup*/*.txt*',
+    };
+    const intended = {
+      applications: ['application001', 'application002'],
+      environments: ['environment001', 'environment002'],
+      containers: ['container001', 'container002'],
+      templates: ['templateGroup001/template001.txt.j2', 'templateGroup003/not-a-template.txt'],
+    }
+
+    before('get scope', () => {
+      result = scope.getScope(argv)
+    });
+
+    it('should contain everything', () => {
+      result.should.eql(intended);
+    });
+  });
+
+  describe('templates in subdirs', () => {
+    const argv = {
+      templatePaths: 'templateGroup002/**',
+    };
+    const intended = {
+      applications: ['application001', 'application002'],
+      environments: ['environment001', 'environment002'],
+      containers: ['container001', 'container002'],
+      templates: ['templateGroup002/subdir1/subdir1a/template1a.txt.j2',
+        'templateGroup002/subdir1/template1.txt.j2',
+        'templateGroup002/subdir2/template2.txt.j2'
+      ],
     }
 
     before('get scope', () => {

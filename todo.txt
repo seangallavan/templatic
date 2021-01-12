@@ -8,7 +8,6 @@
 - create directories for each environment and populate them
 - script to deploy should have option to overwrite or not
 - symbolic links to real files after rendering
-- when creating template, create metadata.yml
 - remove empty files/directories
 
 Docs Todos

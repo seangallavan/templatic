@@ -20,7 +20,7 @@ describe('commands/render', () => {
     });
 
     before('render', () => {
-      execSync(`${__dirname}/../../cli.sh render -a application001 -d test/data`);
+      execSync(`${__dirname}/../../cli.sh render -a application001 -d test/data templateGroup001/*`);
     });
 
     before('get generated', () => {
